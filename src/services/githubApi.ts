@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { ReviewResult, InlineReviewComment } from '../types';
+import { ReviewResult, InlineReviewComment } from '../types.js';
 
 export function validateWebhookSignature(
   rawBody: Buffer | string,
