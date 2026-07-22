@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { LanguageSelector } from './LanguageSelector';
 import { ShareModal } from './ShareModal';
 import { GitHubRepoModal } from './GitHubRepoModal';
-import { safeFetchJson } from '../lib/fetchUtils';
 import { CodeReviewResponse } from '../types';
 import { 
   Play, 
@@ -194,7 +193,7 @@ export const SimpleCodeReviewer: React.FC<SimpleCodeReviewerProps> = ({ initialR
     setLoading(true);
 
     try {
-      const data = await safeFetchJson('/api/code/review', {
+      const res = await fetch('/api/code/review', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -202,6 +201,11 @@ export const SimpleCodeReviewer: React.FC<SimpleCodeReviewerProps> = ({ initialR
           code: inputCode
         })
       });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Server error while reviewing code.');
+      }
 
       setReviewResult(data);
       // Automatically switch to errors tab if errors exist, else corrected code
@@ -227,7 +231,7 @@ export const SimpleCodeReviewer: React.FC<SimpleCodeReviewerProps> = ({ initialR
     if (!reviewResult) return;
     setSharing(true);
     try {
-      const data = await safeFetchJson('/api/code/share', {
+      const res = await fetch('/api/code/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -237,8 +241,11 @@ export const SimpleCodeReviewer: React.FC<SimpleCodeReviewerProps> = ({ initialR
           reviewResult
         })
       });
-      if (data.shareUrl) {
+      const data = await res.json();
+      if (res.ok && data.shareUrl) {
         setShareUrl(data.shareUrl);
+      } else {
+        alert("Could not generate share link: " + (data.error || "Unknown error"));
       }
     } catch (err: any) {
       alert("Sharing error: " + err.message);

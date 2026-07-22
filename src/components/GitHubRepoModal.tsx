@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Github, Upload, Download, Check, X, AlertTriangle, ExternalLink, RefreshCw, Key } from 'lucide-react';
-import { safeFetchJson } from '../lib/fetchUtils';
 
 interface GitHubRepoModalProps {
   currentCode: string;
@@ -53,7 +52,7 @@ export const GitHubRepoModal: React.FC<GitHubRepoModalProps> = ({
     setLoading(true);
 
     try {
-      const data = await safeFetchJson('/api/github/fetch-file', {
+      const res = await fetch('/api/github/fetch-file', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -64,6 +63,11 @@ export const GitHubRepoModal: React.FC<GitHubRepoModalProps> = ({
           token: token.trim() || undefined
         })
       });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to fetch file from GitHub repository.');
+      }
 
       onFileFetched(data.content, data.name || filePath);
       setSuccessResult({
@@ -97,7 +101,7 @@ export const GitHubRepoModal: React.FC<GitHubRepoModalProps> = ({
     setLoading(true);
 
     try {
-      const data = await safeFetchJson('/api/github/commit-file', {
+      const res = await fetch('/api/github/commit-file', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -110,6 +114,11 @@ export const GitHubRepoModal: React.FC<GitHubRepoModalProps> = ({
           token: token.trim() || undefined
         })
       });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to upload file to GitHub repository.');
+      }
 
       setSuccessResult({
         message: data.message || `File successfully uploaded to ${parsed.owner}/${parsed.repo}!`,

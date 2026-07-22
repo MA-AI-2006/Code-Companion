@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { LanguageSelector } from './LanguageSelector';
 import { ShareModal } from './ShareModal';
 import { GitHubRepoModal } from './GitHubRepoModal';
-import { safeFetchJson } from '../lib/fetchUtils';
 import { CodeGenerationResponse } from '../types';
 import { 
   Sparkles, 
@@ -82,7 +81,7 @@ export const CodeGenerator: React.FC<CodeGeneratorProps> = ({ initialGenData }) 
     setLoading(true);
 
     try {
-      const data = await safeFetchJson('/api/code/generate', {
+      const res = await fetch('/api/code/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -90,6 +89,11 @@ export const CodeGenerator: React.FC<CodeGeneratorProps> = ({ initialGenData }) 
           question
         })
       });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Server error while generating code.');
+      }
 
       setGenResult(data);
     } catch (err: any) {
@@ -109,7 +113,7 @@ export const CodeGenerator: React.FC<CodeGeneratorProps> = ({ initialGenData }) 
     if (!genResult) return;
     setSharing(true);
     try {
-      const data = await safeFetchJson('/api/code/share', {
+      const res = await fetch('/api/code/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -119,8 +123,11 @@ export const CodeGenerator: React.FC<CodeGeneratorProps> = ({ initialGenData }) 
           generationResult: genResult
         })
       });
-      if (data.shareUrl) {
+      const data = await res.json();
+      if (res.ok && data.shareUrl) {
         setShareUrl(data.shareUrl);
+      } else {
+        alert("Could not generate share link: " + (data.error || "Unknown error"));
       }
     } catch (err: any) {
       alert("Sharing error: " + err.message);
