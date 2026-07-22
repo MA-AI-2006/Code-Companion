@@ -608,4 +608,10 @@ async function startServer() {
   });
 }
 
-startServer();
+// Export app for serverless deployment (Netlify / Vercel)
+export { app };
+
+if (!process.env.NETLIFY && !process.env.VERCEL) {
+  startServer();
+}
+

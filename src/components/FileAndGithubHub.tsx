@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LanguageSelector } from './LanguageSelector';
 import { ShareModal } from './ShareModal';
+import { safeFetchJson } from '../lib/fetchUtils';
 import { CodeReviewResponse, WebhookEventLog } from '../types';
 import { 
   FolderPlus, 
@@ -113,15 +114,13 @@ print("Result:", process_data(data))
 
   // Load Settings & Webhook info on mount
   useEffect(() => {
-    fetch('/api/webhooks/info')
-      .then(res => res.json())
+    safeFetchJson('/api/webhooks/info')
       .then(data => {
         setWebhookUrl(data.webhookUrl || `${window.location.origin}/api/webhooks/github`);
       })
       .catch(console.error);
 
-    fetch('/api/settings')
-      .then(res => res.json())
+    safeFetchJson('/api/settings')
       .then(data => {
         if (data.githubToken) setGithubToken(data.githubToken);
         if (data.webhookSecret) setWebhookSecret(data.webhookSecret);
@@ -133,8 +132,7 @@ print("Result:", process_data(data))
 
   const fetchLogs = () => {
     setLoadingLogs(true);
-    fetch('/api/webhooks/logs')
-      .then(res => res.json())
+    safeFetchJson('/api/webhooks/logs')
       .then(data => {
         if (Array.isArray(data)) setLogs(data);
       })
@@ -146,7 +144,7 @@ print("Result:", process_data(data))
     setSavingSettings(true);
     setSaveSuccess(false);
     try {
-      const res = await fetch('/api/settings', {
+      await safeFetchJson('/api/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -155,16 +153,15 @@ print("Result:", process_data(data))
         })
       });
 
-      if (res.ok) {
-        setSaveSuccess(true);
-        setTimeout(() => setSaveSuccess(false), 3000);
-      }
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) {
       console.error(err);
     } finally {
       setSavingSettings(false);
     }
   };
+
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -206,7 +203,7 @@ print("Result:", process_data(data))
     setGhStatusMsg(null);
 
     try {
-      const res = await fetch('/api/github/fetch-file', {
+      const data = await safeFetchJson('/api/github/fetch-file', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -217,11 +214,6 @@ print("Result:", process_data(data))
           token: githubToken.trim() || undefined
         })
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to fetch file from GitHub.');
-      }
 
       setCode(data.content);
       setFilename(data.name || filePathInput);
@@ -259,7 +251,7 @@ print("Result:", process_data(data))
     setGhStatusMsg(null);
 
     try {
-      const res = await fetch('/api/github/commit-file', {
+      const data = await safeFetchJson('/api/github/commit-file', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -272,11 +264,6 @@ print("Result:", process_data(data))
           token: githubToken.trim() || undefined
         })
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to commit file to GitHub.');
-      }
 
       setGhStatusMsg({
         type: 'success',
@@ -300,7 +287,7 @@ print("Result:", process_data(data))
     setReviewing(true);
 
     try {
-      const res = await fetch('/api/code/review', {
+      const data = await safeFetchJson('/api/code/review', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -308,9 +295,6 @@ print("Result:", process_data(data))
           code
         })
       });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Review failed.');
 
       setReviewResult(data);
       if (data.hasErrors && data.errors.length > 0) {
@@ -329,7 +313,7 @@ print("Result:", process_data(data))
     setTestingPing(true);
     setPingResult(null);
     try {
-      const res = await fetch('/api/webhooks/github', {
+      const data = await safeFetchJson('/api/webhooks/github', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -345,8 +329,7 @@ print("Result:", process_data(data))
           sender: { login: 'github-user' }
         })
       });
-      const data = await res.json();
-      setPingResult({ status: res.status, data });
+      setPingResult({ status: 200, data });
       fetchLogs();
     } catch (err: any) {
       setPingResult({ status: 'ERROR', error: err.message });
@@ -359,7 +342,7 @@ print("Result:", process_data(data))
     if (!reviewResult) return;
     setSharing(true);
     try {
-      const res = await fetch('/api/code/share', {
+      const data = await safeFetchJson('/api/code/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -369,14 +352,14 @@ print("Result:", process_data(data))
           reviewResult
         })
       });
-      const data = await res.json();
-      if (res.ok && data.shareUrl) setShareUrl(data.shareUrl);
+      if (data.shareUrl) setShareUrl(data.shareUrl);
     } catch (err: any) {
       alert("Sharing error: " + err.message);
     } finally {
       setSharing(false);
     }
   };
+
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
