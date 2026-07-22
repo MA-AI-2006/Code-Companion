@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { CodeReviewResponse, CodeGenerationResponse } from "../types";
+import { CodeReviewResponse, CodeGenerationResponse } from "../types.js";
 
 function getAiClient() {
   const apiKey = process.env.GEMINI_API_KEY;
