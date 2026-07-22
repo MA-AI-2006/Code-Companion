@@ -18,6 +18,7 @@ const sharedSnippetsMap = new Map<string, SharedSnippet>();
 
 // Enable raw body capture for HMAC SHA256 Webhook verification
 app.use(express.json({
+  limit: '4mb',
   verify: (req: any, _res, buf) => {
     req.rawBody = buf;
   }
