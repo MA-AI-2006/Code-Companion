@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { ReviewResult, StaticIssue, InlineReviewComment, ReviewerSettings } from "../types";
+import { ReviewResult, StaticIssue, InlineReviewComment, ReviewerSettings } from "../types.js";
 
 export async function runGeminiCodeReview(params: {
   prTitle: string;
