@@ -47,7 +47,7 @@ ${code}
 Analyze this code thoroughly and return JSON matching the schema.`;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash-lite',
+    model: 'gemini-3.1-flash-lite',
     contents: prompt,
     config: {
       systemInstruction,
@@ -145,7 +145,7 @@ Question / Problem Statement:
 Generate the complete solution code, explanation, and expected output.`;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash-lite',
+    model: 'gemini-3.1-flash-lite',
     contents: prompt,
     config: {
       systemInstruction,
