@@ -66,7 +66,7 @@ Provide a comprehensive review including:
 6. Positive highlights of good practices found in the code.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
+      model: 'gemini-2.5-flash-lite',
       contents: prompt,
       config: {
         systemInstruction,
