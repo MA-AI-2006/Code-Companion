@@ -2,7 +2,6 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import { createServer as createViteServer } from 'vite';
 import { runStaticCodeAnalysis } from './src/services/staticAnalyzer.js';
 import { runGeminiCodeReview } from './src/services/llmAnalyzer.js';
 import { reviewCodeWithGemini, generateCodeFromQuestion } from './src/services/simpleReviewer.js';
@@ -590,6 +589,7 @@ function parseGitDiffToFiles(rawDiff: string): { filename: string; patch: string
 
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa'
