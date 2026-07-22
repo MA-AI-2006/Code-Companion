@@ -1,0 +1,7 @@
+{
+  "name": "Code Companion",
+  "description": "Select programming language or auto-detect, review code with error explanations, corrected code, expected output, generate code from question statements, and share code links.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
