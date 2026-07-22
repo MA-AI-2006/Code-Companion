@@ -3,11 +3,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { createServer as createViteServer } from 'vite';
-import { runStaticCodeAnalysis } from './src/services/staticAnalyzer';
-import { runGeminiCodeReview } from './src/services/llmAnalyzer';
-import { reviewCodeWithGemini, generateCodeFromQuestion } from './src/services/simpleReviewer';
-import { postPullRequestReviewToGitHub, validateWebhookSignature } from './src/services/githubApi';
-import { WebhookEventLog, ReviewerSettings, SharedSnippet } from './src/types';
+import { runStaticCodeAnalysis } from './src/services/staticAnalyzer.js';
+import { runGeminiCodeReview } from './src/services/llmAnalyzer.js';
+import { reviewCodeWithGemini, generateCodeFromQuestion } from './src/services/simpleReviewer.js';
+import { postPullRequestReviewToGitHub, validateWebhookSignature } from './src/services/githubApi.js';
+import { WebhookEventLog, ReviewerSettings, SharedSnippet } from './src/types.js';
 
 dotenv.config();
 
