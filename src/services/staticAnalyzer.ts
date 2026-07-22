@@ -1,4 +1,4 @@
-import { StaticIssue, IssueCategory } from '../types';
+import { StaticIssue, IssueCategory } from '../types.js';
 
 interface Rule {
   id: string;
